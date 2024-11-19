@@ -1,6 +1,7 @@
 ## 섹션4.
 
-![스크린샷 2024-11-19 오후 9.49.37.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/b462bc13-eb0e-4caa-8d9d-de5fce4a9524/74378a97-d046-49e9-92f2-605492518a38/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2024-11-19_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_9.49.37.png)
+<img width="954" alt="스크린샷 2024-11-19 오후 9 49 37" src="https://github.com/user-attachments/assets/5051df58-7da3-458a-9b62-d56ff6e8c5c8">
+
 
 ### MVC 모델
 
@@ -243,3 +244,5 @@ public class MemberServiceTest {
 - `@Transactional` : 반복 가능한 테스트 지원, 각각의 테스트를 실행할 때마다 트랜잭션을 시작하고 테스트가 끝나면 트랜잭션을 강제로 롤백 (이 어노테이션이 테스트 케이스에서 사용될 때만 롤백)
 
 Given, When, Then에 대해서는 다음에 공부..ㅎ
+
+
