@@ -245,4 +245,107 @@ public class MemberServiceTest {
 
 Given, When, Then에 대해서는 다음에 공부..ㅎ
 
+## 섹션6.
+
+**상품 엔티티 코드**
+
+```java
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
+@Getter @Setter
+public abstract class Item {
+		@Id @GeneratedValue
+    @Column(name = "item_id")
+    private Long id;
+    private String name;
+    private int price;
+    private int stockQuantity;
+    @ManyToMany(mappedBy = "items")
+    private List<Category> categories = new ArrayList<Category>();
+     
+		public void addStock(int quantity) {
+				this.stockQuantity += quantity;
+    }
+    public void removeStock(int quantity) {
+        int restStock = this.stockQuantity - quantity;
+        if (restStock < 0) {
+            throw new NotEnoughStockException("need more stock");         
+            }
+        this.stockQuantity = restStock;
+    }
+}
+```
+
+- `addStock()` 메서드는 파라미터로 넘어온 수만큼 재고를 늘린다. 이 메서드는 재고가 증가하거나 상품 주문을 취소해서 재고를 다시 늘려야 할 때 사용한다.
+- `removeStock()` 메서드는 파라미터로 넘어온 수만큼 재고를 줄인다. 만약 재고가 부족하면 예외가 발생한다. 주로 상품을 주문할 때 사용한다.
+
+### `@ManyToMany` 란?
+
+JPA에서 두 엔티티 간의 다대다 관계를 매핑할 때 사용하는 어노테이션
+
+다대다 관계: 하나의 엔티티가 여러 개의 다른 엔티티와 관계를 맺고, 그 반대도 가능한 관계
+
+<aside>
+💡
+
+객체 지향언어에서는 2개의 컬렉션 객체로 다대다 관계를 표현 할 수 있지만, 관계형 데이터베이스는 정규화된 2개의 테이블로 다대다 관계를 표현할 수 없어 중간 테이블을 생성해야 한다.
+
+</aside>
+
+### 다대다 맵핑 방법 1- `@ManyToMany` 어노테이션 활용
+
+**장점**
+
+- `@ManyToMany`를 사용하면 연결 테이블을 자동으로 처리해주므로 도메인 모델이 단순해지고 편리하다.
+
+**단점**
+
+- JPA에서 다대다 관계를 설정하면 내부적으로 중간 테이블이 존재하기때문에 예상치 못한 쿼리가 발생한다.
+- 연결 테이블에 컬럼을 추가할 수 없다.
+
+### 다대다 맵핑 방법 2- 중간 테이블을 **Entity**로 만들어 일대다 - 다대일 관계를 매핑해주는 방식(더욱 선호되는 방식)
+
+**상품 레포지토리 코드**
+
+```java
+@Repository
+@RequiredArgsConstructor
+public class ItemRepository {
+		private final EntityManager em;
+    public void save(Item item) {
+		    if (item.getId() == null) {
+		        em.persist(item);
+        } else {
+            em.merge(item);
+        }
+    }
+    public Item findOne(Long id) {  
+        return em.find(Item.class, id);
+    }
+    public List<Item> findAll() {
+        return em.createQuery("select i from Item i",Item.class).getResultList();
+    }
+}
+```
+
+**상품 서비스 코드**
+```java
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class ItemService {
+		private final ItemRepository itemRepository;
+    @Transactional
+    public void saveItem(Item item) {
+		    itemRepository.save(item);
+    }
+    public List<Item> findItems() {
+        return itemRepository.findAll();
+    }
+    public Item findOne(Long itemId) {
+	      return itemRepository.findOne(itemId);
+		} 
+}
+```
 
